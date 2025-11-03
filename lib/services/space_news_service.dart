@@ -1,20 +1,15 @@
+
 import 'package:http/http.dart' as http;
-import '../data_models/space_news_model.dart';
+import '../data_models/space_news.dart';
 
-/// Fetches a page of Spaceflight News articles (v4 API).
-/// Returns just the `results` list to keep the UI simple.
-Future<List<Result>> fetchSpaceNews({int limit = 10, int offset = 0}) async {
-  final uri = Uri.https(
-    'api.spaceflightnewsapi.net',
-    '/v4/articles/',
-    {'limit': '$limit', 'offset': '$offset'},
-  );
+class SpaceNewsService {
+  Future<List<SpaceNews>> getSpaceNews() async {
+    final response = await http.get(Uri.parse('https://api.spaceflightnewsapi.net/v3/articles'));
 
-  final resp = await http.get(uri);
-  if (resp.statusCode != 200) {
-    throw Exception('Space News API ${resp.statusCode}');
+    if (response.statusCode == 200) {
+      return spaceNewsFromJson(response.body);
+    } else {
+      throw Exception('Failed to load space news');
+    }
   }
-
-  final payload = spaceNewsFromJson(resp.body);
-  return payload.results;
 }
